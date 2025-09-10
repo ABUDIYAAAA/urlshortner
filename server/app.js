@@ -15,7 +15,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+console.log("CORS allowed origin:", process.env.FRONTEND_URL);
 app.use(helmet());
 app.use(morgan("dev"));
 app.set("trust proxy", true);
