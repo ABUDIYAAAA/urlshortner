@@ -100,6 +100,7 @@ const redirectUrl = async (req, res) => {
       { shortCode },
       {
         $inc: { clicks: 1 },
+        $set: { lastAccessed: new Date() },
       },
       { new: true }
     );

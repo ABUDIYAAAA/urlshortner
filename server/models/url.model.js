@@ -42,6 +42,9 @@ const urlSchema = new mongoose.Schema({
     ref: "User",
     default: null,
   },
+  lastAccessed: {
+    type: Date,
+  },
 });
 
 urlSchema.virtual("status").get(function () {
