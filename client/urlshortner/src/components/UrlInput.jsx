@@ -4,7 +4,7 @@ const UrlInput = ({ url, setUrl, onSubmit, isValid, isLoading, error }) => {
   const normalizeUrl = (rawUrl) => {
     if (!rawUrl) return "";
     if (!/^https?:\/\//i.test(rawUrl)) {
-      return `https://${rawUrl}`;
+      return `http://${rawUrl}`;
     }
     return rawUrl;
   };
