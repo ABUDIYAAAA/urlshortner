@@ -134,6 +134,7 @@ const getUrlStats = async (req, res) => {
         createdAt: urlDoc.createdAt,
         expiresAt: urlDoc.expiresAt,
         status: urlDoc.status,
+        lastAccessed: urlDoc.lastAccessed,
       },
     });
   } catch (error) {
