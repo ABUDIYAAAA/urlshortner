@@ -12,6 +12,13 @@ const validateUrl = (string) => {
   }
 };
 
+// Helper function to get base URL from request
+const getBaseUrl = (req) => {
+  const protocol = req.protocol;
+  const host = req.get("host");
+  return `${protocol}://${host}`;
+};
+
 const createUrl = async (req, res) => {
   try {
     const { url, customCode, expireAfter } = req.body;
@@ -38,7 +45,8 @@ const createUrl = async (req, res) => {
       }
     }
 
-    const baseUrl = "https://lnks.co";
+    // Use dynamic base URL from the current request
+    const baseUrl = getBaseUrl(req);
     const shortUrl = `${baseUrl}/${shortCode}`;
 
     const qrCode = await QRCode.toDataURL(shortUrl);
@@ -59,6 +67,9 @@ const createUrl = async (req, res) => {
         shortCode: newUrl.shortCode,
         qrCode: newUrl.qrCode,
         expiresAt: newUrl.expiresAt,
+        originalUrl: newUrl.originalUrl,
+        clicks: newUrl.clicks,
+        createdAt: newUrl.createdAt,
       },
     });
   } catch (error) {
@@ -67,4 +78,67 @@ const createUrl = async (req, res) => {
   }
 };
 
-export { createUrl };
+const redirectUrl = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    if (!shortCode) {
+      return res.status(400).json({ error: "Short code is required" });
+    }
+
+    const urlDoc = await Url.findOne({ shortCode });
+
+    if (!urlDoc) {
+      return res.status(404).json({ error: "Short URL not found" });
+    }
+
+    if (urlDoc.expiresAt && urlDoc.expiresAt < new Date()) {
+      return res.status(410).json({ error: "This short URL has expired" });
+    }
+
+    await Url.findOneAndUpdate(
+      { shortCode },
+      {
+        $inc: { clicks: 1 },
+      },
+      { new: true }
+    );
+
+    return res.redirect(301, urlDoc.originalUrl);
+  } catch (error) {
+    console.error("Error redirecting URL:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// Get URL statistics
+const getUrlStats = async (req, res) => {
+  try {
+    const { shortCode } = req.params;
+
+    const urlDoc = await Url.findOne({ shortCode });
+
+    if (!urlDoc) {
+      return res.status(404).json({ error: "Short URL not found" });
+    }
+
+    res.status(200).json({
+      message: "URL statistics retrieved successfully",
+      data: {
+        shortCode: urlDoc.shortCode,
+        shortUrl: urlDoc.shortUrl,
+        originalUrl: urlDoc.originalUrl,
+        clicks: urlDoc.clicks,
+        isActive: urlDoc.isActive,
+        createdAt: urlDoc.createdAt,
+        expiresAt: urlDoc.expiresAt,
+        status: urlDoc.status,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching URL stats:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export { createUrl, redirectUrl, getUrlStats };
