@@ -1,25 +1,11 @@
 import { Zap } from "lucide-react";
 
 const UrlInput = ({ url, setUrl, onSubmit, isValid, isLoading, error }) => {
-  const normalizeUrl = (rawUrl) => {
-    if (!rawUrl) return "";
-    if (!/^https?:\/\//i.test(rawUrl)) {
-      return `http://${rawUrl}`;
-    }
-    return rawUrl;
-  };
-
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && isValid && !isLoading) {
       e.preventDefault();
-      handleSubmit();
+      onSubmit();
     }
-  };
-
-  const handleSubmit = () => {
-    const normalized = normalizeUrl(url);
-    setUrl(normalized);
-    onSubmit(normalized);
   };
 
   return (
@@ -39,7 +25,7 @@ const UrlInput = ({ url, setUrl, onSubmit, isValid, isLoading, error }) => {
 
         {/* Button */}
         <button
-          onClick={handleSubmit}
+          onClick={onSubmit}
           disabled={!isValid || isLoading}
           className={`px-8 py-4 font-semibold transition-all flex items-center justify-center gap-2 w-full sm:w-auto ${
             isValid && !isLoading

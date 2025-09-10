@@ -31,7 +31,7 @@ const Home = () => {
       return u.protocol === "http:" || u.protocol === "https:";
     } catch {
       try {
-        new URL("https://" + string);
+        new URL("http://" + string);
         return true;
       } catch {
         return false;
@@ -43,13 +43,21 @@ const Home = () => {
     setIsValidUrl(url.trim() && validateUrl(url.trim()));
   }, [url]);
 
+  const normalizeUrl = (rawUrl) => {
+    if (!rawUrl) return "";
+    if (!/^https?:\/\//i.test(rawUrl)) {
+      return `http://${rawUrl}`;
+    }
+    return rawUrl;
+  };
+
   const handleSubmit = async () => {
     if (loading || !isValidUrl) return;
 
     setLocalError(null);
 
     const result = await createUrl({
-      og: url,
+      og: normalizeUrl(url),
       exp: expiry,
       custom: customCode || undefined,
     });
