@@ -1,4 +1,4 @@
-import URL from "../models/.model.js";
+import Url from "../models/url.model.js";
 import QRCode from "qrcode";
 import { nanoid } from "nanoid";
 
@@ -6,7 +6,8 @@ const validateUrl = (string) => {
   try {
     const u = new URL(string);
     return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
+  } catch (error) {
+    console.log("Failed with error:", error.message);
     return false;
   }
 };
@@ -14,12 +15,10 @@ const validateUrl = (string) => {
 const createUrl = async (req, res) => {
   try {
     const { url, customCode, expireAfter } = req.body;
-
     if (!url || !validateUrl(url)) {
       return res.status(400).json({ error: "Invalid or missing URL" });
     }
 
-    // handle expiry
     let expiresAt = null;
     if (expireAfter && expireAfter !== "never") {
       const hours = parseInt(expireAfter, 10);
@@ -28,12 +27,10 @@ const createUrl = async (req, res) => {
       }
     }
 
-    // generate shortCode
     let shortCode = customCode ? customCode.trim() : nanoid(6);
 
-    // check if customCode already exists
     if (customCode) {
-      const existing = await URL.findOne({ shortCode });
+      const existing = await Url.findOne({ shortCode });
       if (existing) {
         return res
           .status(400)
@@ -41,15 +38,13 @@ const createUrl = async (req, res) => {
       }
     }
 
-    // your base domain
     const baseUrl = "https://lnks.co";
     const shortUrl = `${baseUrl}/${shortCode}`;
 
-    // generate QR code (as Data URL)
     const qrCode = await QRCode.toDataURL(shortUrl);
 
     // save to DB
-    const newUrl = await URL.create({
+    const newUrl = await Url.create({
       originalUrl: url,
       shortCode,
       shortUrl,

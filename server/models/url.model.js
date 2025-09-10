@@ -42,10 +42,6 @@ const urlSchema = new mongoose.Schema({
     ref: "User",
     default: null,
   },
-  meta: {
-    ip: String,
-    userAgent: String,
-  },
 });
 
 urlSchema.virtual("status").get(function () {
@@ -54,5 +50,5 @@ urlSchema.virtual("status").get(function () {
   return "active";
 });
 
-const URL = mongoose.model("URL", urlSchema);
-export default URL;
+const Url = mongoose.model("Url", urlSchema);
+export default Url;
