@@ -1,16 +1,31 @@
 import { Zap } from "lucide-react";
 
 const UrlInput = ({ url, setUrl, onSubmit, isValid, isLoading, error }) => {
+  const normalizeUrl = (rawUrl) => {
+    if (!rawUrl) return "";
+    if (!/^https?:\/\//i.test(rawUrl)) {
+      return `https://${rawUrl}`;
+    }
+    return rawUrl;
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && isValid && !isLoading) {
       e.preventDefault();
-      onSubmit();
+      handleSubmit();
     }
   };
 
+  const handleSubmit = () => {
+    const normalized = normalizeUrl(url);
+    setUrl(normalized);
+    onSubmit(normalized);
+  };
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex rounded-2xl overflow-hidden shadow-lg border border-white/20 bg-white/5 backdrop-blur-sm">
+    <div className="flex flex-col gap-2 w-full">
+      <div className="flex flex-col sm:flex-row rounded-2xl overflow-hidden shadow-lg border border-white/20 bg-white/5 backdrop-blur-sm w-full">
+        {/* Input */}
         <input
           type="text"
           value={url}
@@ -18,13 +33,15 @@ const UrlInput = ({ url, setUrl, onSubmit, isValid, isLoading, error }) => {
           onKeyDown={handleKeyDown}
           placeholder="Enter your URL here..."
           aria-label="URL input field"
-          className="flex-1 px-6 py-4 bg-transparent text-white placeholder-slate-400 focus:outline-none text-lg"
+          className="flex-1 px-6 py-4 bg-transparent text-white placeholder-slate-400 focus:outline-none text-lg w-full"
           disabled={isLoading}
         />
+
+        {/* Button */}
         <button
-          onClick={onSubmit}
+          onClick={handleSubmit}
           disabled={!isValid || isLoading}
-          className={`px-8 py-4 font-semibold transition-all flex items-center gap-2 ${
+          className={`px-8 py-4 font-semibold transition-all flex items-center justify-center gap-2 w-full sm:w-auto ${
             isValid && !isLoading
               ? "bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 text-white shadow-lg transform hover:scale-105"
               : "bg-slate-700/50 text-slate-500 cursor-not-allowed"
