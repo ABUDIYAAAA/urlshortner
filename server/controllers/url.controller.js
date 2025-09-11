@@ -123,6 +123,18 @@ const getUrlStats = async (req, res) => {
       return res.status(404).json({ error: "Short URL not found" });
     }
 
+    const formattedLastAccessed = urlDoc.lastAccessed
+      ? new Date(urlDoc.lastAccessed).toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "Asia/Kolkata",
+        })
+      : "N/A";
+
     res.status(200).json({
       message: "URL statistics retrieved successfully",
       data: {
@@ -134,7 +146,7 @@ const getUrlStats = async (req, res) => {
         createdAt: urlDoc.createdAt,
         expiresAt: urlDoc.expiresAt,
         status: urlDoc.status,
-        lastAccessed: urlDoc.lastAccessed,
+        lastAccessed: formattedLastAccessed,
       },
     });
   } catch (error) {
