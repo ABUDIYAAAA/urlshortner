@@ -119,14 +119,14 @@ const UrlHistoryPanel = ({ urls, onCopy, copyStatus }) => {
                   <div className="flex items-center gap-2">
                     {getFaviconUrl(url.originalUrl) && (
                       <img
-                        src={getFaviconUrl(url.originalUrl)}
+                        src={url.originalUrl}
                         alt=""
                         className="w-4 h-4"
                         onError={(e) => (e.target.style.display = "none")}
                       />
                     )}
                     <span className="text-slate-300 text-sm truncate max-w-[200px]">
-                      {url.originalUrl}
+                      {url.originalUrl} {/* Display the original URL as text */}
                     </span>
                     <a
                       href={url.originalUrl}

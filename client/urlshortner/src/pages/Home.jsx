@@ -46,7 +46,7 @@ const Home = () => {
   const normalizeUrl = (rawUrl) => {
     if (!rawUrl) return "";
     if (!/^https?:\/\//i.test(rawUrl)) {
-      return `http://${rawUrl}`;
+      return `https://${rawUrl}`;
     }
     return rawUrl;
   };
@@ -71,7 +71,7 @@ const Home = () => {
     const urlObject = {
       shortUrl: result.shortUrl,
       shortCode: result.shortCode,
-      originalUrl: url,
+      originalUrl: normalizeUrl(url),
       qrCode: result.qrCode,
       expiresAt: result.expiresAt,
       createdAt: new Date().toISOString(),
